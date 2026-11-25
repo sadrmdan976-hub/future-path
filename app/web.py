@@ -150,7 +150,7 @@ def _security_headers(response: Response) -> None:
         "font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; "
         "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
     )
-    if settings.APP_BASE_URL.startswith("https://"):
+    if settings.COOKIE_SECURE or settings.APP_BASE_URL.startswith("https://"):
         response.headers.setdefault(
             "Strict-Transport-Security", "max-age=15552000; includeSubDomains"
         )
