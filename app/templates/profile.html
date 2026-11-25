@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import progress_ring with context %}
+{% block title %}ملفي المهني | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap page-head-row">
+    <div>
+      <span class="eyebrow">ملفي المهني</span>
+      <h1>بياناتك الأكاديمية والمهنية</h1>
+      <p class="muted">احفظ التغييرات بعد كل تعديل. هذه البيانات تُستخدم في سيرتك الذاتية وطلباتك.</p>
+      <div class="head-chips">
+        {% if user.is_demo %}<span class="badge badge-demo">حساب تجريبي</span>{% endif %}
+        <span class="chip">{{ icon("shield") }} بياناتك خاصة ولا تظهر لأي جهة تلقائياً</span>
+      </div>
+    </div>
+    <a class="btn btn-ghost btn-sm" href="/cv">{{ icon("doc") }} معاينة السيرة</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap profile-grid">
+    <form method="post" action="/profile" class="form profile-form" id="profileForm">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+
+      {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("user") }} المعلومات الأساسية</h2>
+          <span class="muted small">مطلوب لرفع اكتمال الملف</span>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="full_name">الاسم الكامل</label>
+            <input id="full_name" name="full_name" value="{{ profile.full_name }}" required maxlength="120">
+          </div>
+          <div class="field">
+            <label for="email">البريد الإلكتروني</label>
+            <input id="email" value="{{ profile.email }}" disabled dir="ltr">
+            <small class="hint">لا يمكن تغيير البريد من هنا.</small>
+          </div>
+          <div class="field">
+            <label for="university">الجامعة</label>
+            <input id="university" name="university" value="{{ profile.university or '' }}" list="universities" maxlength="160" placeholder="جامعة القمة الحديثة">
+            <datalist id="universities">{% for u in universities %}<option value="{{ u }}">{% endfor %}</datalist>
+          </div>
+          <div class="field">
+            <label for="college">الكلية</label>
+            <input id="college" name="college" value="{{ profile.college or '' }}" maxlength="160" placeholder="كلية الاقتصاد والعلوم السياسية">
+          </div>
+          <div class="field">
+            <label for="major">التخصص</label>
+            <input id="major" name="major" value="{{ profile.major or '' }}" maxlength="160" placeholder="إدارة الأعمال">
+          </div>
+          <div class="field">
+            <label for="study_year">السنة الدراسية</label>
+            <select id="study_year" name="study_year">
+              <option value="">اختر السنة</option>
+              {% for y in study_years %}<option value="{{ y }}" {{ 'selected' if profile.study_year == y }}>{{ y }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="city">المدينة</label>
+            <input id="city" name="city" value="{{ profile.city or '' }}" maxlength="80" placeholder="طرابلس">
+          </div>
+        </div>
+        <div class="field">
+          <label for="bio">نبذة شخصية</label>
+          <textarea id="bio" name="bio" rows="4" maxlength="1500" placeholder="اكتب 3–5 أسطر عنك، اهتماماتك، وما تسعى إليه مهنياً.">{{ profile.bio or '' }}</textarea>
+          <small class="hint">حتى 1500 حرف.</small>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("star") }} المهارات</h2>
+          <button type="button" class="btn btn-soft btn-sm" data-add-row="skills">{{ icon("plus") }} إضافة مهارة</button>
+        </div>
+        <div class="rows" data-rows="skills">
+          {% for s in skills %}
+          <div class="row-item">
+            <input name="skill_name" value="{{ s.skill_name }}" maxlength="80" placeholder="اسم المهارة">
+            <select name="skill_level">
+              {% for lvl, label in skill_levels.items() %}<option value="{{ lvl }}" {{ 'selected' if s.level == lvl }}>{{ label }}</option>{% endfor %}
+            </select>
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+          {% endfor %}
+        </div>
+        <template data-template="skills">
+          <div class="row-item">
+            <input name="skill_name" maxlength="80" placeholder="مثال: التسويق الرقمي">
+            <select name="skill_level">
+              {% for lvl, label in skill_levels.items() %}<option value="{{ lvl }}" {{ 'selected' if lvl == 3 }}>{{ label }}</option>{% endfor %}
+            </select>
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+        </template>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("layers") }} اللغات</h2>
+          <button type="button" class="btn btn-soft btn-sm" data-add-row="languages">{{ icon("plus") }} إضافة لغة</button>
+        </div>
+        <div class="rows" data-rows="languages">
+          {% for l in languages %}
+          <div class="row-item">
+            <input name="language_name" value="{{ l.language }}" maxlength="60" placeholder="اللغة">
+            <select name="language_level">
+              {% for key, label in proficiency.items() %}<option value="{{ key }}" {{ 'selected' if l.proficiency == key }}>{{ label }}</option>{% endfor %}
+            </select>
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+          {% endfor %}
+        </div>
+        <template data-template="languages">
+          <div class="row-item">
+            <input name="language_name" maxlength="60" placeholder="مثال: الإنجليزية">
+            <select name="language_level">
+              {% for key, label in proficiency.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+            </select>
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+        </template>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("doc") }} الدورات</h2>
+          <button type="button" class="btn btn-soft btn-sm" data-add-row="courses">{{ icon("plus") }} إضافة دورة</button>
+        </div>
+        <div class="rows" data-rows="courses">
+          {% for c in courses %}
+          <div class="row-item three">
+            <input name="course_title" value="{{ c.title }}" maxlength="160" placeholder="اسم الدورة">
+            <input name="course_provider" value="{{ c.provider or '' }}" maxlength="120" placeholder="الجهة المانحة">
+            <input name="course_year" value="{{ c.year or '' }}" maxlength="12" placeholder="السنة">
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+          {% endfor %}
+        </div>
+        <template data-template="courses">
+          <div class="row-item three">
+            <input name="course_title" maxlength="160" placeholder="مثال: أساسيات التسويق الرقمي">
+            <input name="course_provider" maxlength="120" placeholder="مثال: Google">
+            <input name="course_year" maxlength="12" placeholder="2026">
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+        </template>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("briefcase") }} المشاريع</h2>
+          <button type="button" class="btn btn-soft btn-sm" data-add-row="projects">{{ icon("plus") }} إضافة مشروع</button>
+        </div>
+        <div class="rows" data-rows="projects">
+          {% for p in projects %}
+          <div class="row-item project">
+            <input name="project_title" value="{{ p.title }}" maxlength="160" placeholder="اسم المشروع">
+            <textarea name="project_description" rows="2" maxlength="700" placeholder="وصف مختصر للمشروع">{{ p.description or '' }}</textarea>
+            <input name="project_link" value="{{ p.link or '' }}" maxlength="400" placeholder="رابط المشروع (اختياري)" dir="ltr">
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+          {% endfor %}
+        </div>
+        <template data-template="projects">
+          <div class="row-item project">
+            <input name="project_title" maxlength="160" placeholder="اسم المشروع">
+            <textarea name="project_description" rows="2" maxlength="700" placeholder="وصف مختصر"></textarea>
+            <input name="project_link" maxlength="400" placeholder="https://" dir="ltr">
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+        </template>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("chart") }} الخبرات</h2>
+          <button type="button" class="btn btn-soft btn-sm" data-add-row="experiences">{{ icon("plus") }} إضافة خبرة</button>
+        </div>
+        <div class="rows" data-rows="experiences">
+          {% for e in experiences %}
+          <div class="row-item experience">
+            <input name="exp_title" value="{{ e.title }}" maxlength="160" placeholder="المسمى (مثال: متدرب تسويق)">
+            <input name="exp_organization" value="{{ e.organization or '' }}" maxlength="160" placeholder="الجهة">
+            <input name="exp_period" value="{{ e.period or '' }}" maxlength="60" placeholder="الفترة (مثال: صيف 2026)">
+            <textarea name="exp_description" rows="2" maxlength="700" placeholder="أبرز المهام والإنجازات">{{ e.description or '' }}</textarea>
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+          {% endfor %}
+        </div>
+        <template data-template="experiences">
+          <div class="row-item experience">
+            <input name="exp_title" maxlength="160" placeholder="المسمى">
+            <input name="exp_organization" maxlength="160" placeholder="الجهة">
+            <input name="exp_period" maxlength="60" placeholder="الفترة">
+            <textarea name="exp_description" rows="2" maxlength="700" placeholder="المهام"></textarea>
+            <button type="button" class="icon-btn" data-remove-row aria-label="حذف">{{ icon("trash") }}</button>
+          </div>
+        </template>
+      </div>
+
+      <div class="save-bar">
+        <span class="muted small">راجع بياناتك ثم احفظ.</span>
+        <button type="submit" class="btn btn-primary">{{ icon("check") }} حفظ التغييرات</button>
+      </div>
+    </form>
+
+    <aside class="profile-side">
+      <div class="card sticky-card">
+        {{ progress_ring(comp.score) }}
+        <h3 class="center">اكتمال الملف</h3>
+        {% if comp.tips %}
+        <ul class="tips">
+          {% for tip in comp.tips %}<li>{{ icon("info") }} {{ tip }}</li>{% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted small center">ملفك مكتمل. يمكنك الآن إنشاء سيرتك والتقديم على الفرص.</p>
+        {% endif %}
+        <a class="btn btn-soft btn-block" href="/cv">معاينة السيرة {{ icon("arrow") }}</a>
+        <div class="notice small-note">
+          {{ icon("shield") }}
+          <div>لا تظهر بياناتك لأي جهة إلا عند تقديمك على فرصة تابعة لها.</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

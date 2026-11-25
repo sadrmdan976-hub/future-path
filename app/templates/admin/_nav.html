@@ -1,0 +1,11 @@
+{% from "_icons.html" import icon %}
+{% set p = request.url.path %}
+<nav class="admin-tabs" aria-label="أقسام الإدارة">
+  <a class="admin-tab {{ 'active' if p == '/admin' }}" href="/admin">{{ icon("chart") }} النظرة العامة</a>
+  <a class="admin-tab {{ 'active' if p.startswith('/admin/opportunities') }}" href="/admin/opportunities">{{ icon("briefcase") }} الفرص</a>
+  <a class="admin-tab {{ 'active' if p.startswith('/admin/organizations') }}" href="/admin/organizations">{{ icon("building") }} الجهات</a>
+  <a class="admin-tab {{ 'active' if p.startswith('/admin/applications') }}" href="/admin/applications">{{ icon("users") }} الطلبات</a>
+  <a class="admin-tab {{ 'active' if p.startswith('/admin/reports') }}" href="/admin/reports">{{ icon("flag") }} البلاغات</a>
+  <a class="admin-tab {{ 'active' if p.startswith('/admin/users') }}" href="/admin/users">{{ icon("user") }} المستخدمون</a>
+  <a class="admin-tab {{ 'active' if p.startswith('/admin/paths') }}" href="/admin/paths">{{ icon("path") }} المسارات</a>
+</nav>

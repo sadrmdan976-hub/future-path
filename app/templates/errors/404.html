@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}الصفحة غير موجودة | FUTURE PATH{% endblock %}
+{% block content %}
+<section class="section error-page">
+  <div class="wrap error-box">
+    <div class="error-code">404</div>
+    <h1>الصفحة غير موجودة</h1>
+    <p class="muted">قد يكون الرابط قديماً أو أن الصفحة نُقلت. جرّب العودة للرئيسية أو تصفح الفرص.</p>
+    <div class="error-actions">
+      <a class="btn btn-primary" href="/">{{ icon("arrow") }} الرئيسية</a>
+      <a class="btn btn-soft" href="/opportunities">تصفح الفرص</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

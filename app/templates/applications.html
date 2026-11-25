@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import status_badge, empty_state with context %}
+{% block title %}طلباتي | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap page-head-row">
+    <div>
+      <span class="eyebrow">طلباتي</span>
+      <h1>متابعة طلبات التقديم</h1>
+      <p class="muted">تظهر هنا كل الطلبات المرتبطة بحسابك فقط، مع حالتها الحالية.</p>
+    </div>
+    <a class="btn btn-soft btn-sm" href="/opportunities">{{ icon("briefcase") }} تصفّح الفرص</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    {% if rows %}
+    <div class="table-wrap card">
+      <table class="table">
+        <thead>
+          <tr><th>الفرصة</th><th>الجهة</th><th>النوع</th><th>تاريخ التقديم</th><th>آخر تحديث</th><th>الحالة</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for a in rows %}
+          <tr>
+            <td>
+              {% if a.title %}<strong>{{ a.title }}</strong><br><span class="muted small">{{ a.city or "" }}</span>
+              {% else %}<span class="muted">فرصة غير متاحة حالياً</span>{% endif %}
+            </td>
+            <td>{{ a.org_name or "—" }}</td>
+            <td>{% if a.type %}{{ labels.OPP_TYPE[a.type] }}{% else %}—{% endif %}</td>
+            <td>{{ a.applied_at|ar_date }}</td>
+            <td>{{ a.updated_at|ar_date }}</td>
+            <td>{{ status_badge(a.status) }}</td>
+            <td>
+              {% if a.status in active_statuses %}
+              <form method="post" action="/applications/{{ a.id }}/withdraw" data-confirm="هل تريد سحب هذا الطلب؟">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button class="btn btn-ghost btn-xs" type="submit">سحب</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="status-legend">
+      {% for key, label in labels.APP_STATUS.items() %}
+      <span class="legend-item">{{ status_badge(key) }} {{ label }}</span>
+      {% endfor %}
+    </div>
+    {% else %}
+      {{ empty_state("لم تقدّم على أي فرصة بعد", "ابدأ بتصفح الفرص المنشورة وقدّم بسيرتك المحفوظة في المنصة.", "/opportunities", "تصفّح الفرص") }}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

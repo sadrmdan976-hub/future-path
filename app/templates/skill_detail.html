@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import path_card with context %}
+{% block title %}{{ path.title }} | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head skill-head">
+  <div class="wrap">
+    <a class="back-link" href="/skills">{{ icon("arrow") }} كل المسارات</a>
+    <div class="head-chips">
+      <span class="chip chip-brand">{{ categories[path.category] }}</span>
+      <span class="chip">{{ labels.PATH_LEVEL[path.level] }}</span>
+      {% if path.duration %}<span class="chip">{{ path.duration }}</span>{% endif %}
+      {% if path.is_demo %}<span class="badge badge-demo">بيانات تجريبية</span>{% endif %}
+    </div>
+    <h1>{{ path.title }}</h1>
+    <p class="muted">{{ path.description }}</p>
+    <div class="head-actions">
+      <a class="btn btn-primary" href="{{ path.resource_url }}" target="_blank" rel="noopener noreferrer">فتح المورد التعليمي {{ icon("external") }}</a>
+      <a class="btn btn-ghost" href="/opportunities">فرص في هذا المجال</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap two-col">
+    <div class="card prose-card flat">
+      <h2>عن هذا المسار</h2>
+      <p>{{ path.description }}</p>
+      <h3>كيف تستفيد منه؟</h3>
+      <ul class="list-check">
+        <li>خصّص 30–60 دقيقة يومياً لمدة أسبوعين كبداية.</li>
+        <li>طبّق ما تتعلمه في مشروع صغير وأضفه إلى ملفك.</li>
+        <li>بعد إتمام المسار، أضف المهارة في ملفك المهني بمستوى واقعي.</li>
+        <li>اربط تقدمك بفرصة تدريب مناسبة لتختبر ما تعلمته.</li>
+      </ul>
+      <div class="notice">
+        {{ icon("external") }}
+        <div>المورد تعليمي خارجي وتُفتح روابطه في نافذة جديدة. المنصة لا تتبع نشاطك في المواقع الخارجية.</div>
+      </div>
+    </div>
+    <aside>
+      <div class="card">
+        <h2 class="card-title">{{ icon("layers") }} مسارات قريبة</h2>
+        {% if related %}
+        <div class="stack">
+          {% for p in related %}
+          <a class="mini-path" href="/skills/{{ p.id }}">
+            <strong>{{ p.title }}</strong>
+            <span>{{ labels.PATH_LEVEL[p.level] }}{% if p.duration %} · {{ p.duration }}{% endif %}</span>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted small">لا توجد مسارات أخرى في هذه الفئة بعد.</p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

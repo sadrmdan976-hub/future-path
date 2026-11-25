@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}خطأ {{ code }} | FUTURE PATH{% endblock %}
+{% block content %}
+<section class="section error-page">
+  <div class="wrap error-box">
+    <div class="error-code">{{ code }}</div>
+    <h1>حدث خطأ في الطلب</h1>
+    <p class="muted">{{ message or "تعذر إكمال الطلب. جرّب مرة أخرى." }}</p>
+    <div class="error-actions">
+      <a class="btn btn-primary" href="/">{{ icon("arrow") }} العودة للرئيسية</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

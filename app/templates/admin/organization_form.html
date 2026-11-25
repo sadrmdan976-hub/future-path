@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}تعديل الجهة | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <a class="back-link" href="/admin/organizations">{{ icon("arrow") }} الجهات</a>
+    <h1>تعديل الجهة</h1>
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap form-narrow">
+    {% if error %}<div class="notice notice-error">{{ icon("warning") }}<div>{{ error }}</div></div>{% endif %}
+    <form method="post" action="/admin/organizations/{{ org.id }}" class="form card">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="field"><label>اسم الجهة <span class="req">*</span></label><input name="name" value="{{ org.name }}" maxlength="160" required></div>
+      <div class="grid-2">
+        <div class="field"><label>المدينة</label><input name="city" value="{{ org.city or '' }}" list="citiesList" maxlength="80"><datalist id="citiesList">{% for c in labels.CITIES %}<option value="{{ c }}">{% endfor %}</datalist></div>
+        <div class="field">
+          <label>حالة التوثيق</label>
+          <select name="verification_status">
+            {% for key, label in {'pending':'قيد التوثيق','verified':'موثقة','rejected':'مرفوضة'}.items() %}
+            <option value="{{ key }}" {{ 'selected' if org.verification_status == key }}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>بيانات التواصل</label><input name="contact_details" value="{{ org.contact_details or '' }}" maxlength="400"></div>
+      <div class="field"><label>وصف الجهة</label><textarea name="description" rows="5" maxlength="1200">{{ org.description or '' }}</textarea></div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">حفظ التعديلات</button>
+        <a class="btn btn-ghost" href="/admin/organizations">إلغاء</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

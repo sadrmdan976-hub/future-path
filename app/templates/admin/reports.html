@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}البلاغات | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">الإدارة</span>
+    <h1>البلاغات</h1>
+    <p class="muted">بلاغات الطلاب عن الفرص. راجعها ثم عالجها أو أغلقها.</p>
+    {% include "admin/_nav.html" %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap">
+    <div class="chip-row">
+      {% for key, label in {'open':'مفتوحة','resolved':'تمت المعالجة','dismissed':'مرفوضة','all':'الكل'}.items() %}
+      <a class="chip {{ 'active' if f_status == key }}" href="/admin/reports?status={{ key }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    {% if rows %}
+    <div class="report-list">
+      {% for r in rows %}
+      <div class="card report-item">
+        <div class="report-head">
+          <div>
+            <strong>{{ r.reason }}</strong>
+            <div class="muted small">
+              {% if r.opp_title %}<a href="/opportunities/{{ r.opportunity_id }}">{{ r.opp_title }}</a> · {% endif %}
+              {{ r.reporter_name or "طالب" }} · {{ r.created_at|ar_datetime }}
+            </div>
+          </div>
+          <span class="badge {{ 'badge-warn' if r.status == 'open' else 'badge-ok' if r.status == 'resolved' else 'badge-neutral' }}">
+            {{ {'open':'مفتوح','resolved':'تمت المعالجة','dismissed':'مرفوض'}.get(r.status, r.status) }}
+          </span>
+        </div>
+        {% if r.details %}<p class="para">{{ r.details }}</p>{% endif %}
+        <div class="inline-actions">
+          {% if r.status != 'resolved' %}
+          <form method="post" action="/admin/reports/{{ r.id }}/status">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="status" value="resolved">
+            <button class="btn btn-primary btn-xs" type="submit">{{ icon("check") }} تمت المعالجة</button>
+          </form>
+          {% endif %}
+          {% if r.status != 'dismissed' %}
+          <form method="post" action="/admin/reports/{{ r.id }}/status">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="status" value="dismissed">
+            <button class="btn btn-ghost btn-xs" type="submit">رفض البلاغ</button>
+          </form>
+          {% endif %}
+          {% if r.status != 'open' %}
+          <form method="post" action="/admin/reports/{{ r.id }}/status">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="status" value="open">
+            <button class="btn btn-ghost btn-xs" type="submit">إعادة فتح</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty"><h3>لا توجد بلاغات</h3><p>ضمن هذا الفلتر لا توجد بلاغات حالياً.</p></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

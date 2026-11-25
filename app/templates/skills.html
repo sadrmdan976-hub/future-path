@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import path_card, empty_state with context %}
+{% block title %}مسارات المهارات | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">طوّر مهاراتك</span>
+    <h1>مسارات عملية تبدأ بها اليوم</h1>
+    <p class="muted">مسارات مختارة في المهارات الرقمية واللغات والتواصل والمهارات المهنية وريادة الأعمال، مع روابط موارد خارجية مجانية.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="filter-chips">
+      <a class="chip-filter {{ 'active' if not active_category }}" href="/skills">الكل ({{ counts.values()|sum }})</a>
+      {% for key, label in categories.items() %}
+      <a class="chip-filter {{ 'active' if active_category == key }}" href="/skills?category={{ key }}">{{ label }} ({{ counts.get(key, 0) }})</a>
+      {% endfor %}
+    </div>
+
+    <div class="cards-grid">
+      {% for p in paths %}
+        {{ path_card(p) }}
+      {% else %}
+        {{ empty_state("لا توجد مسارات في هذه الفئة", "جرّب فئة أخرى أو ارجع لاحقاً.", "/skills", "كل المسارات") }}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}سيرتي الذاتية | FUTURE PATH{% endblock %}
+{% block body_class %}page-cv{% endblock %}
+{% set t = {
+  'ar': {'back':'لوحتي','title':'سيرتي الذاتية','print':'طباعة أو حفظ PDF','switch':'English version','summary':'نبذة','skills':'المهارات','langs':'اللغات','courses':'الدورات','projects':'المشاريع','exp':'الخبرات','edu':'التعليم','contact':'بيانات التواصل','empty':'أضف بياناتك من الملف المهني لتظهر في السيرة.','demo':'بيانات تجريبية لأغراض العرض فقط — FUTURE PATH','year':'السنة'},
+  'en': {'back':'Dashboard','title':'My CV','print':'Print or save PDF','switch':'النسخة العربية','summary':'Summary','skills':'Skills','langs':'Languages','courses':'Courses','projects':'Projects','exp':'Experience','edu':'Education','contact':'Contact','empty':'Add your details in the profile to fill the CV.','demo':'Demo data for presentation only — FUTURE PATH','year':'Year'}
+} %}
+{% set tr = t[lang] %}
+
+{% block content %}
+<section class="cv-toolbar no-print">
+  <div class="wrap cv-toolbar-inner">
+    <div>
+      <a class="back-link" href="/dashboard">{{ icon("arrow") }} {{ tr.back }}</a>
+      <h1>{{ tr.title }}</h1>
+    </div>
+    <div class="toolbar-actions">
+      <a class="btn btn-ghost btn-sm" href="/cv?lang={{ 'en' if lang == 'ar' else 'ar' }}">{{ tr.switch }}</a>
+      <a class="btn btn-soft btn-sm" href="/profile">{{ icon("edit") }} تعديل البيانات</a>
+      <button type="button" class="btn btn-primary btn-sm" data-print>{{ icon("print") }} {{ tr.print }}</button>
+    </div>
+  </div>
+</section>
+
+<section class="cv-stage">
+  <div class="wrap">
+    {% if comp.score < 60 %}
+    <div class="notice notice-demo no-print">
+      {{ icon("info") }}
+      <div>سيرتك ما زالت غير مكتملة ({{ comp.score }}%). <a href="/profile">أكمل بياناتك</a> لتظهر بشكل أفضل قبل الطباعة.</div>
+    </div>
+    {% endif %}
+
+    {% if not (profile.university or profile.major or profile.bio or skills or languages or courses or projects or experiences) %}
+      <div class="empty no-print"><h3>{{ tr.empty }}</h3><a class="btn btn-primary btn-sm" href="/profile">تعديل الملف المهني</a></div>
+    {% endif %}
+
+    <article class="cv-sheet" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
+      <header class="cv-head">
+        <div class="cv-identity">
+          <h1>{{ profile.full_name }}</h1>
+          {% if profile.major %}<p class="cv-role">{{ profile.major }}{% if profile.study_year %} · {{ profile.study_year }}{% endif %}</p>{% endif %}
+          {% if profile.college or profile.university %}
+          <p class="cv-sub">{% if profile.college %}{{ profile.college }}{% endif %}{% if profile.college and profile.university %} — {% endif %}{{ profile.university or '' }}</p>
+          {% endif %}
+        </div>
+        <div class="cv-contact">
+          <span dir="ltr">{{ profile.email }}</span>
+          {% if profile.city %}<span>{{ icon("pin") }} {{ profile.city }}</span>{% endif %}
+          <span class="cv-brand">FUTURE PATH</span>
+        </div>
+      </header>
+
+      {% if profile.bio %}
+      <section class="cv-section">
+        <h2>{{ tr.summary }}</h2>
+        <p class="cv-para">{{ profile.bio }}</p>
+      </section>
+      {% endif %}
+
+      <div class="cv-grid">
+        <div class="cv-col-main">
+          {% if experiences %}
+          <section class="cv-section">
+            <h2>{{ tr.exp }}</h2>
+            {% for e in experiences %}
+            <div class="cv-item">
+              <div class="cv-item-head"><strong>{{ e.title }}</strong>{% if e.period %}<span>{{ e.period }}</span>{% endif %}</div>
+              {% if e.organization %}<div class="cv-item-sub">{{ e.organization }}</div>{% endif %}
+              {% if e.description %}<p class="cv-para">{{ e.description }}</p>{% endif %}
+            </div>
+            {% endfor %}
+          </section>
+          {% endif %}
+
+          {% if projects %}
+          <section class="cv-section">
+            <h2>{{ tr.projects }}</h2>
+            {% for p in projects %}
+            <div class="cv-item">
+              <div class="cv-item-head"><strong>{{ p.title }}</strong>{% if p.link %}<span dir="ltr">{{ p.link }}</span>{% endif %}</div>
+              {% if p.description %}<p class="cv-para">{{ p.description }}</p>{% endif %}
+            </div>
+            {% endfor %}
+          </section>
+          {% endif %}
+
+          {% if courses %}
+          <section class="cv-section">
+            <h2>{{ tr.courses }}</h2>
+            <ul class="cv-list">
+              {% for c in courses %}
+              <li><strong>{{ c.title }}</strong>{% if c.provider %} — {{ c.provider }}{% endif %}{% if c.year %} ({{ c.year }}){% endif %}</li>
+              {% endfor %}
+            </ul>
+          </section>
+          {% endif %}
+        </div>
+
+        <aside class="cv-col-side">
+          {% if skills %}
+          <section class="cv-section">
+            <h2>{{ tr.skills }}</h2>
+            <div class="cv-skills">
+              {% for s in skills %}
+              <div class="cv-skill">
+                <span>{{ s.skill_name }}</span>
+                <span class="cv-dots">{% for i in range(1, 6) %}<i class="{{ 'on' if i <= s.level }}"></i>{% endfor %}</span>
+              </div>
+              {% endfor %}
+            </div>
+          </section>
+          {% endif %}
+
+          {% if languages %}
+          <section class="cv-section">
+            <h2>{{ tr.langs }}</h2>
+            <ul class="cv-list">
+              {% for l in languages %}<li>{{ l.language }} — {{ labels.PROFICIENCY[l.proficiency] }}</li>{% endfor %}
+            </ul>
+          </section>
+          {% endif %}
+
+          {% if profile.university %}
+          <section class="cv-section">
+            <h2>{{ tr.edu }}</h2>
+            <div class="cv-item">
+              <div class="cv-item-head"><strong>{{ profile.university }}</strong>{% if profile.study_year %}<span>{{ profile.study_year }}</span>{% endif %}</div>
+              <div class="cv-item-sub">{% if profile.college %}{{ profile.college }}{% endif %}{% if profile.major %}{% if profile.college %} · {% endif %}{{ profile.major }}{% endif %}</div>
+            </div>
+          </section>
+          {% endif %}
+        </aside>
+      </div>
+
+      <footer class="cv-foot">
+        {{ tr.demo if user.is_demo else 'FUTURE PATH — مستقبلك' }}
+      </footer>
+    </article>
+  </div>
+</section>
+{% endblock %}

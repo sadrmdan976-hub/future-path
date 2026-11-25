@@ -1,0 +1,43 @@
+{% from "_icons.html" import icon %}
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand brand-light" href="/">
+        <span class="brand-mark">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M6 26V15l7 5V9l7 5V5l6 4v17z" fill="currentColor" opacity=".9"/>
+            <circle cx="24.5" cy="25" r="2" fill="#eaa33b"/>
+          </svg>
+        </span>
+        <span class="brand-text"><strong>FUTURE PATH</strong><small>مستقبلك</small></span>
+      </a>
+      <p>من مقاعد الدراسة إلى سوق العمل. منصة تجريبية لربط طلاب الجامعات بالفرص والمسارات المهنية.</p>
+      <span class="badge badge-demo">{{ DEMO_NOTICE }}</span>
+    </div>
+    <div class="footer-col">
+      <h4>المنصة</h4>
+      <a href="/opportunities">الفرص</a>
+      <a href="/skills">مسارات المهارات</a>
+      <a href="/auth/register">إنشاء حساب</a>
+      <a href="/auth/login">تسجيل الدخول</a>
+    </div>
+    <div class="footer-col">
+      <h4>الحساب</h4>
+      <a href="/dashboard">لوحة الطالب</a>
+      <a href="/profile">الملف المهني</a>
+      <a href="/cv">السيرة الذاتية</a>
+      <a href="/applications">طلباتي</a>
+    </div>
+    <div class="footer-col">
+      <h4>معلومات</h4>
+      <a href="/privacy">الخصوصية والبيانات</a>
+      <a href="/#how">كيف تعمل المنصة</a>
+      <a href="/#demo-opportunities">فرص تجريبية</a>
+      <span class="muted small">جامعة القمة الحديثة</span>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© 2026 FUTURE PATH — نسخة عرض تجريبية غير مخصصة للإطلاق التجاري.</span>
+    <span class="footer-flag">{{ icon("shield") }} بيانات وهمية وموسومة بوضوح</span>
+  </div>
+</footer>

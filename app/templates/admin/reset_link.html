@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}رابط إعادة التعيين | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <a class="back-link" href="/admin/users">{{ icon("arrow") }} المستخدمون</a>
+    <h1>رابط إعادة تعيين كلمة المرور</h1>
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap form-narrow">
+    <div class="notice notice-warn">{{ icon("warning") }}<div>هذا الرابط يعمل مرة واحدة فقط وصلاحيته ساعة واحدة. لا تنشره علناً — أرسله للطالب مباشرة.</div></div>
+
+    <div class="card">
+      <h2 class="card-title">الطالب</h2>
+      <dl class="kv">
+        <div><dt>الاسم</dt><dd>{{ target_user.full_name }}</dd></div>
+        <div><dt>البريد</dt><dd dir="ltr">{{ target_user.email }}</dd></div>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">الرابط</h2>
+      <div class="copy-box">
+        <input id="resetUrl" type="text" value="{{ reset_url }}" readonly dir="ltr">
+        <button class="btn btn-soft btn-sm" type="button" data-copy-target="#resetUrl">{{ icon("doc") }} نسخ</button>
+      </div>
+      <p class="muted small">افتح الرابط في نافذة خاصة: يسجّل الدخول مباشرة لصفحة تعيين كلمة مرور جديدة.</p>
+      <a class="btn btn-primary btn-sm" href="{{ reset_url }}" dir="ltr">فتح رابط إعادة التعيين</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

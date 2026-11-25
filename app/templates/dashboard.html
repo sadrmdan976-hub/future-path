@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import progress_ring, opp_card, status_badge, empty_state with context %}
+{% block title %}لوحتي | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head dash-head">
+  <div class="wrap dash-head-inner">
+    <div>
+      <span class="eyebrow">لوحة الطالب</span>
+      <h1>مرحباً، {{ user.first_name }}</h1>
+      <p class="muted">
+        {% if profile.major %}{{ profile.major }} · {{ profile.university or "جامعة القمة الحديثة" }}{% else %}أكمل ملفك المهني لتظهر بياناتك هنا{% endif %}
+      </p>
+      <div class="head-chips">
+        {% if user.is_demo %}<span class="badge badge-demo">حساب تجريبي لأغراض العرض</span>{% endif %}
+        <span class="chip">{{ icon("chart") }} اكتمال الملف {{ comp.score }}%</span>
+      </div>
+    </div>
+    <div class="head-actions">
+      <a class="btn btn-soft btn-sm" href="/profile">{{ icon("edit") }} تعديل الملف</a>
+      <a class="btn btn-ghost btn-sm" href="/cv">{{ icon("doc") }} معاينة السيرة</a>
+    </div>
+  </div>
+</section>
+
+<section class="section dashboard">
+  <div class="wrap dash-grid">
+    <div class="dash-main">
+      <div class="card completion-card">
+        <div class="completion-top">
+          {{ progress_ring(comp.score) }}
+          <div class="completion-copy">
+            <h2>ملفك المهني</h2>
+            <p class="muted">كلما اكتمل ملفك، كانت سيرتك أوضح وأقوى أمام الجهات.</p>
+            <div class="completion-actions">
+              <a class="btn btn-primary btn-sm" href="/profile">{{ icon("edit") }} أكمل ملفي</a>
+              {% if comp.tips %}<span class="muted small">التالي: {{ comp.tips[0] }}</span>{% else %}<span class="badge badge-ok">ملف مكتمل</span>{% endif %}
+            </div>
+          </div>
+        </div>
+        <ul class="check-list">
+          {% for label, done, tip, weight in comp.checks %}
+          <li class="{{ 'done' if done }}">
+            <span class="check-dot">{{ icon("check") if done else "" }}</span>
+            <div>
+              <strong>{{ label }}</strong>
+              <small>{{ "مكتمل" if done else tip }}</small>
+            </div>
+            <span class="check-weight">{{ weight }}%</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("briefcase") }} فرص مقترحة لك</h2>
+          <a class="link-more" href="/opportunities">كل الفرص {{ icon("arrow") }}</a>
+        </div>
+        {% if suggestions %}
+        <div class="cards-grid three">
+          {% for o in suggestions %}{{ opp_card(o) }}{% endfor %}
+        </div>
+        {% else %}
+        {{ empty_state("لا توجد فرص جديدة حالياً", "قدّمت على كل الفرص المتاحة أو لم تُنشر فرص بعد.", "/opportunities", "تصفّح الفرص") }}
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("bell") }} آخر طلباتي</h2>
+          <a class="link-more" href="/applications">كل الطلبات {{ icon("arrow") }}</a>
+        </div>
+        {% if applications %}
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>الفرصة</th><th>الجهة</th><th>تاريخ التقديم</th><th>الحالة</th></tr></thead>
+            <tbody>
+              {% for a in applications %}
+              <tr>
+                <td>{{ a.title or "فرصة غير متاحة" }}</td>
+                <td>{{ a.org_name or "—" }}</td>
+                <td>{{ a.applied_at|ar_date }}</td>
+                <td>{{ status_badge(a.status) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        {{ empty_state("لم تقدّم على أي فرصة بعد", "تصفح الفرص المنشورة وابدأ أول تقديم.", "/opportunities", "تصفّح الفرص") }}
+        {% endif %}
+      </div>
+    </div>
+
+    <aside class="dash-side">
+      <div class="card profile-mini">
+        <div class="avatar avatar-lg">{{ user.full_name[:1] }}</div>
+        <h3>{{ user.full_name }}</h3>
+        <p class="muted small" dir="ltr">{{ user.email }}</p>
+        <div class="mini-stats">
+          <div><strong>{{ counters.skills }}</strong><span>مهارة</span></div>
+          <div><strong>{{ counters.languages }}</strong><span>لغة</span></div>
+          <div><strong>{{ counters.applications }}</strong><span>طلب</span></div>
+        </div>
+        <div class="mini-stats second">
+          <div><strong>{{ counters.courses }}</strong><span>دورة</span></div>
+          <div><strong>{{ counters.projects }}</strong><span>مشروع</span></div>
+          <div><strong>{{ counters.experiences }}</strong><span>خبرة</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">{{ icon("sparkle") }} اكتشف نفسك</h2>
+        {% if quiz %}
+          <p class="muted small">آخر نتيجة إرشادية:</p>
+          <div class="chip-row">
+            {% for f in quiz.suggested_fields %}<span class="chip chip-brand">{{ f }}</span>{% endfor %}
+          </div>
+          <div class="card-actions">
+            <a class="btn btn-soft btn-sm" href="/discover">عرض النتيجة</a>
+          </div>
+        {% else %}
+          <p class="muted small">أجب عن 5 أسئلة قصيرة لتحصل على مجالات إرشادية تناسبك.</p>
+          <a class="btn btn-primary btn-sm" href="/discover">ابدأ الاختبار</a>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">{{ icon("star") }} مهاراتي</h2>
+          <a class="link-more" href="/profile">تعديل {{ icon("arrow") }}</a>
+        </div>
+        {% if skills %}
+        <div class="skill-mini">
+          {% for s in skills[:6] %}
+          <div class="skill-mini-row">
+            <span>{{ s.skill_name }}</span>
+            <span class="dots">{% for i in range(1, 6) %}<i class="{{ 'on' if i <= s.level }}"></i>{% endfor %}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted small">لم تضف مهارات بعد. أضف مهارتين على الأقل لرفع اكتمال ملفك.</p>
+        {% endif %}
+        <a class="btn btn-ghost btn-sm btn-block" href="/skills">طوّر مهاراتك {{ icon("arrow") }}</a>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

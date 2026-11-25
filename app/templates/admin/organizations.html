@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}الجهات | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">الإدارة</span>
+    <h1>الجهات</h1>
+    <p class="muted">لا يمكن نشر فرصة قبل توثيق جهتها.</p>
+    {% include "admin/_nav.html" %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap admin-split">
+    <div class="card">
+      <h2 class="card-title">{{ icon("plus") }} إضافة جهة</h2>
+      <form method="post" action="/admin/organizations" class="form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <div class="field"><label>اسم الجهة <span class="req">*</span></label><input name="name" maxlength="160" required></div>
+        <div class="grid-2">
+          <div class="field"><label>المدينة</label><input name="city" list="citiesList" maxlength="80"><datalist id="citiesList">{% for c in labels.CITIES %}<option value="{{ c }}">{% endfor %}</datalist></div>
+          <div class="field">
+            <label>حالة التوثيق</label>
+            <select name="verification_status">
+              <option value="pending">قيد التوثيق</option>
+              <option value="verified">موثقة</option>
+              <option value="rejected">مرفوضة</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>بيانات التواصل</label><input name="contact_details" maxlength="400" placeholder="ايميل أو هاتف للتواصل الداخلي"></div>
+        <div class="field"><label>وصف الجهة</label><textarea name="description" rows="4" maxlength="1200"></textarea></div>
+        <label class="check"><input type="checkbox" name="is_demo"> <span>جهة تجريبية (لأغراض العرض فقط)</span></label>
+        <button class="btn btn-primary btn-sm" type="submit">إضافة الجهة</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">الجهات المسجلة ({{ rows|length }})</h2>
+      {% if rows %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>الجهة</th><th>المدينة</th><th>التوثيق</th><th>الفرص</th><th></th></tr></thead>
+          <tbody>
+            {% for org in rows %}
+            <tr>
+              <td>
+                <strong>{{ org.name }}</strong>
+                {% if org.is_demo %}<span class="badge badge-demo">تجريبي</span>{% endif %}
+                {% if org.verification_status == 'verified' %}<span class="badge badge-ok">موثقة</span>
+                {% elif org.verification_status == 'rejected' %}<span class="badge badge-danger">مرفوضة</span>
+                {% else %}<span class="badge badge-warn">قيد التوثيق</span>{% endif %}
+              </td>
+              <td>{{ org.city or "—" }}</td>
+              <td>{{ org.verification_status }}</td>
+              <td>{{ org.opps_count }}</td>
+              <td><a class="btn btn-ghost btn-xs" href="/admin/organizations/{{ org.id }}/edit">{{ icon("edit") }} تعديل</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="muted">لا توجد جهات بعد.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

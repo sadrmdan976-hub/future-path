@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import status_badge, badge with context %}
+{% block title %}طلب {{ row.student_name }} | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <a class="back-link" href="/admin/applications">{{ icon("arrow") }} الطلبات</a>
+    <h1>طلب: {{ row.student_name }}</h1>
+    <div class="head-chips">
+      {{ status_badge(row.status) }}
+      <span class="chip" dir="ltr">{{ row.student_email }}</span>
+      <span class="chip">تاريخ التقديم: {{ row.applied_at|ar_date }}</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap detail-grid">
+    <div class="detail-main">
+      <div class="card">
+        <h2 class="card-title">{{ icon("briefcase") }} الفرصة</h2>
+        <dl class="kv">
+          <div><dt>العنوان</dt><dd>{{ row.opp_title or "—" }}</dd></div>
+          <div><dt>الجهة</dt><dd>{{ row.org_name or "—" }}</dd></div>
+          <div><dt>المدينة</dt><dd>{{ row.city or "—" }}</dd></div>
+          <div><dt>آخر موعد</dt><dd>{{ row.deadline|ar_date if row.deadline else "—" }}</dd></div>
+        </dl>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">{{ icon("doc") }} نسخة السيرة المرسلة</h2>
+        <p class="muted small">هذه نسخة ثابتة (Snapshot) من بيانات الطالب لحظة التقديم.</p>
+
+        <div class="cv-snapshot">
+          <div class="snap-head">
+            <div>
+              <h3>{{ snapshot.get('full_name') or row.student_name }}</h3>
+              <p class="muted small" dir="ltr">{{ snapshot.get('email') or row.student_email }}</p>
+            </div>
+            <div class="small">
+              {% if snapshot.get('university') %}<div>{{ snapshot.get('university') }}</div>{% endif %}
+              {% if snapshot.get('college') %}<div>{{ snapshot.get('college') }}</div>{% endif %}
+              {% if snapshot.get('major') %}<div>{{ snapshot.get('major') }}{% if snapshot.get('study_year') %} · {{ snapshot.get('study_year') }}{% endif %}</div>{% endif %}
+              {% if snapshot.get('city') %}<div>{{ icon("pin") }} {{ snapshot.get('city') }}</div>{% endif %}
+            </div>
+          </div>
+
+          {% if snapshot.get('bio') %}<p class="para">{{ snapshot.get('bio') }}</p>{% endif %}
+
+          {% if snapshot.get('experiences') %}
+          <h4>الخبرات</h4>
+          <ul class="snap-list">
+            {% for e in snapshot.get('experiences') %}
+            <li><strong>{{ e.title }}</strong>{% if e.organization %} — {{ e.organization }}{% endif %}{% if e.period %} ({{ e.period }}){% endif %}{% if e.description %}<div class="muted small">{{ e.description }}</div>{% endif %}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          {% if snapshot.get('projects') %}
+          <h4>المشاريع</h4>
+          <ul class="snap-list">
+            {% for p in snapshot.get('projects') %}
+            <li><strong>{{ p.title }}</strong>{% if p.link %} — <span dir="ltr">{{ p.link }}</span>{% endif %}{% if p.description %}<div class="muted small">{{ p.description }}</div>{% endif %}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          {% if snapshot.get('courses') %}
+          <h4>الدورات</h4>
+          <ul class="snap-list">
+            {% for c in snapshot.get('courses') %}<li>{{ c.title }}{% if c.provider %} — {{ c.provider }}{% endif %}{% if c.year %} ({{ c.year }}){% endif %}</li>{% endfor %}
+          </ul>
+          {% endif %}
+
+          <div class="snap-cols">
+            {% if snapshot.get('skills') %}
+            <div>
+              <h4>المهارات</h4>
+              <ul class="snap-list">
+                {% for s in snapshot.get('skills') %}<li>{{ s.name }} — {{ labels.SKILL_LEVELS.get(s.level, s.level) }}/5</li>{% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+            {% if snapshot.get('languages') %}
+            <div>
+              <h4>اللغات</h4>
+              <ul class="snap-list">
+                {% for l in snapshot.get('languages') %}<li>{{ l.language }} — {{ labels.PROFICIENCY.get(l.proficiency, l.proficiency) }}</li>{% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="detail-side">
+      <div class="card">
+        <h2 class="card-title">{{ icon("gear") }} تحديث الحالة</h2>
+        <form method="post" action="/admin/applications/{{ row.id }}/status" class="form">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <input type="hidden" name="back" value="/admin/applications/{{ row.id }}">
+          <div class="field">
+            <label>الحالة الجديدة</label>
+            <select name="status">
+              {% for key, label in statuses.items() %}
+              <option value="{{ key }}" {{ 'selected' if row.status == key }}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit">تحديث الحالة</button>
+        </form>
+        <p class="muted small">يتغير ما يراه الطالب مباشرة في «طلباتي».</p>
+      </div>
+      <div class="card">
+        <h2 class="card-title">بيانات التواصل</h2>
+        <p class="small" dir="ltr">{{ row.student_email }}</p>
+        <p class="muted small">استخدم بيانات الطالب للتواصل بشأن هذا الطلب فقط، وفق سياسة الخصوصية.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

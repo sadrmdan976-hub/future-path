@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import status_badge with context %}
+{% block title %}لوحة الإدارة | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">الإدارة</span>
+    <h1>لوحة الإدارة</h1>
+    <p class="muted">مراجعة الفرص والجهات والطلبات والبلاغات من مكان واحد.</p>
+    {% include "admin/_nav.html" %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap">
+    <div class="stats-grid admin-stats">
+      <a class="stat-card" href="/admin/opportunities?status=published"><span class="stat-icon">{{ icon("briefcase") }}</span><strong>{{ counts.published }}</strong><span>فرصة منشورة</span></a>
+      <a class="stat-card" href="/admin/opportunities?status=pending_review"><span class="stat-icon">{{ icon("clock") }}</span><strong>{{ counts.pending }}</strong><span>بانتظار المراجعة</span></a>
+      <a class="stat-card" href="/admin/applications"><span class="stat-icon">{{ icon("doc") }}</span><strong>{{ counts.applications }}</strong><span>إجمالي الطلبات</span></a>
+      <a class="stat-card" href="/admin/applications?status=accepted"><span class="stat-icon">{{ icon("check") }}</span><strong>{{ counts.accepted }}</strong><span>طلبات مقبولة</span></a>
+      <a class="stat-card {{ 'stat-alert' if counts.open_reports }}" href="/admin/reports"><span class="stat-icon">{{ icon("flag") }}</span><strong>{{ counts.open_reports }}</strong><span>بلاغات مفتوحة</span></a>
+      <a class="stat-card" href="/admin/users"><span class="stat-icon">{{ icon("users") }}</span><strong>{{ counts.students }}</strong><span>طالب مسجّل</span></a>
+      <a class="stat-card" href="/admin/organizations"><span class="stat-icon">{{ icon("building") }}</span><strong>{{ counts.orgs_pending }}</strong><span>جهات بانتظار التوثيق</span></a>
+    </div>
+
+    <div class="admin-grid">
+      <div class="card">
+        <div class="card-head-row">
+          <h2 class="card-title">أحدث الطلبات</h2>
+          <a class="link-more" href="/admin/applications">الكل {{ icon("arrow") }}</a>
+        </div>
+        {% if recent_apps %}
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>الطالب</th><th>الفرصة</th><th>التاريخ</th><th>الحالة</th></tr></thead>
+            <tbody>
+              {% for a in recent_apps %}
+              <tr>
+                <td>{{ a.student_name }}</td>
+                <td><a href="/admin/applications/{{ a.id }}">{{ a.opp_title or "—" }}</a></td>
+                <td>{{ a.applied_at|ar_date }}</td>
+                <td>{{ status_badge(a.status) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="muted">لا توجد طلبات بعد.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <div class="card-head-row">
+          <h2 class="card-title">أحدث البلاغات</h2>
+          <a class="link-more" href="/admin/reports">الكل {{ icon("arrow") }}</a>
+        </div>
+        {% if recent_reports %}
+        <ul class="mini-list">
+          {% for r in recent_reports %}
+          <li>
+            <div><strong>{{ r.reason }}</strong><span class="muted small">{{ r.opp_title or "فرصة محذوفة" }} · {{ r.created_at|ar_datetime }}</span></div>
+            {{ status_badge(r.status if r.status in labels.BADGE else "open") }}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">لا توجد بلاغات.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <a class="btn btn-primary btn-sm" href="/admin/opportunities/new">{{ icon("plus") }} فرصة جديدة</a>
+      <a class="btn btn-soft btn-sm" href="/admin/organizations">{{ icon("building") }} إضافة جهة</a>
+      <a class="btn btn-ghost btn-sm" href="/admin/users">{{ icon("key") }} رابط إعادة تعيين</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

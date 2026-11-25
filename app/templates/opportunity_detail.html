@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import badge, status_badge with context %}
+{% block title %}{{ opp.title }} | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head opp-head">
+  <div class="wrap">
+    <a class="back-link" href="/opportunities">{{ icon("arrow") }} كل الفرص</a>
+    <div class="head-chips">
+      {{ badge(labels.OPP_TYPE[opp.type], "badge-info") }}
+      <span class="chip">{{ opp.field }}</span>
+      {% if opp.is_demo %}{{ badge("بيانات تجريبية", "badge-demo") }}{% endif %}
+      {% if opp.is_verified %}{{ badge("موثقة من الإدارة", "badge-ok") }}{% endif %}
+      {% if opp.status != 'published' %}{{ status_badge(opp.status) }}{% endif %}
+    </div>
+    <h1>{{ opp.title }}</h1>
+    <p class="opp-sub">{{ icon("building") }} {{ opp.org_name }}{% if opp.org_status == 'verified' %} {{ badge("جهة موثقة", "badge-ok") }}{% endif %}</p>
+    <div class="opp-facts">
+      <span>{{ icon("pin") }} {{ opp.city }}{% if opp.location_details %} — {{ opp.location_details }}{% endif %}</span>
+      <span>{{ icon("briefcase") }} {{ labels.WORK_MODE[opp.work_mode] }}</span>
+      <span>{{ icon("clock") }} آخر موعد: {{ opp.deadline|ar_date }} {% if opp.deadline|days_left is not none and opp.deadline|days_left >= 0 %}<span class="muted small">(متبقي {{ opp.deadline|days_left }} يوم)</span>{% endif %}</span>
+      {% if opp.published_at %}<span>{{ icon("check") }} نُشرت: {{ opp.published_at|ar_date }}</span>{% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap detail-grid">
+    <div class="detail-main">
+      {% if opp.is_demo %}
+      <div class="notice notice-demo">
+        {{ icon("info") }}
+        <div><strong>فرصة تجريبية لأغراض العرض فقط.</strong> الجهة والبيانات وهمية ولا تمثل عرضاً حقيقياً.</div>
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <h2 class="card-title">وصف الفرصة</h2>
+        {% for line in opp.description.split('\n') if line.strip() %}<p class="para">{{ line }}</p>{% endfor %}
+      </div>
+
+      {% if opp.requirements %}
+      <div class="card">
+        <h2 class="card-title">{{ icon("check") }} المتطلبات</h2>
+        <ul class="list-check">
+          {% for line in opp.requirements.split('\n') if line.strip() %}<li>{{ line.lstrip('•- ').strip() }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if opp.tasks %}
+      <div class="card">
+        <h2 class="card-title">{{ icon("briefcase") }} المهام</h2>
+        <ul class="list-check">
+          {% for line in opp.tasks.split('\n') if line.strip() %}<li>{{ line.lstrip('•- ').strip() }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <h2 class="card-title">{{ icon("building") }} عن الجهة</h2>
+        <p class="para">{{ opp.org_description or "لا يوجد وصف إضافي للجهة." }}</p>
+        <div class="meta-line">{{ icon("pin") }} {{ opp.org_city or opp.city }} {% if opp.org_status == 'verified' %}<span class="badge badge-ok">موثقة</span>{% else %}<span class="badge badge-warn">قيد التوثيق</span>{% endif %}</div>
+      </div>
+
+      {% if user and not user.is_admin %}
+      <details class="card report-box">
+        <summary>{{ icon("flag") }} الإبلاغ عن مشكلة في الفرصة</summary>
+        <form method="post" action="/opportunities/{{ opp.id }}/report" class="form">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <div class="grid-2">
+            <div class="field">
+              <label>سبب البلاغ</label>
+              <select name="reason">
+                {% for r in reasons %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label>تفاصيل إضافية (اختياري)</label>
+              <input name="details" maxlength="1000" placeholder="اكتب ما لاحظته">
+            </div>
+          </div>
+          <button class="btn btn-soft btn-sm" type="submit">إرسال البلاغ للإدارة</button>
+        </form>
+      </details>
+      {% endif %}
+    </div>
+
+    <aside class="detail-side">
+      <div class="card apply-card">
+        {% if not user %}
+          <h2>التقديم على الفرصة</h2>
+          <p class="muted small">سجّل الدخول بحساب طالب لتقديم سيرتك على هذه الفرصة.</p>
+          <a class="btn btn-primary btn-block" href="/auth/login?next=/opportunities/{{ opp.id }}">تسجيل الدخول للتقديم</a>
+          <a class="btn btn-ghost btn-block" href="/auth/register">إنشاء حساب جديد</a>
+        {% elif user.is_admin %}
+          <h2>عرض إداري</h2>
+          <p class="muted small">أنت مسجّل كمسؤول. يمكنك تعديل الفرصة أو تغيير حالتها من لوحة الإدارة.</p>
+          <a class="btn btn-primary btn-block" href="/admin/opportunities/{{ opp.id }}/edit">{{ icon("edit") }} تعديل الفرصة</a>
+        {% elif my_app %}
+          <h2>طلبك على هذه الفرصة</h2>
+          <div class="apply-status">
+            {{ status_badge(my_app.status) }}
+            <span class="muted small">تاريخ التقديم: {{ my_app.applied_at|ar_date }}</span>
+          </div>
+          <p class="muted small">تم حفظ نسخة من سيرتك وقت التقديم.</p>
+          <a class="btn btn-soft btn-block" href="/applications">متابعة في طلباتي</a>
+        {% elif closed_for_apply %}
+          <h2>التقديم مغلق</h2>
+          <p class="muted small">هذه الفرصة لم تعد متاحة للتقديم.</p>
+          <a class="btn btn-ghost btn-block" href="/opportunities">فرص أخرى</a>
+        {% else %}
+          <h2>جاهز للتقديم؟</h2>
+          <p class="muted small">سيتم حفظ نسخة من سيرتك الحالية داخل الطلب. تأكد أن بياناتك محدثة.</p>
+          <form method="post" action="/opportunities/{{ opp.id }}/apply">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <button type="submit" class="btn btn-primary btn-block btn-lg">قدّم على الفرصة {{ icon("arrow") }}</button>
+          </form>
+          <a class="btn btn-ghost btn-block btn-sm" href="/cv">معاينة سيرتي قبل التقديم</a>
+        {% endif %}
+        <div class="apply-note">
+          {{ icon("shield") }}
+          <span>لا تُشارك بياناتك تلقائياً. تُرسل نسخة السيرة مع هذا الطلب فقط.</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">{{ icon("info") }} معلومات سريعة</h2>
+        <dl class="kv">
+          <div><dt>نوع الفرصة</dt><dd>{{ labels.OPP_TYPE[opp.type] }}</dd></div>
+          <div><dt>المجال</dt><dd>{{ opp.field }}</dd></div>
+          <div><dt>المدينة</dt><dd>{{ opp.city }}</dd></div>
+          <div><dt>نوع الدوام</dt><dd>{{ labels.WORK_MODE[opp.work_mode] }}</dd></div>
+          <div><dt>آخر موعد</dt><dd>{{ opp.deadline|ar_date }}</dd></div>
+          <div><dt>حالة التوثيق</dt><dd>{{ "موثقة" if opp.is_verified else "غير موثقة" }}</dd></div>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

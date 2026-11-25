@@ -1,0 +1,10 @@
+{% if flashes %}
+<div class="alerts" role="status">
+  {% for f in flashes %}
+  <div class="alert alert-{{ f.kind if f.kind in ('ok','warn','error','info') else 'info' }}">
+    <span class="alert-dot"></span>
+    <span>{{ f.message }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}

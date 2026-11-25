@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}تعيين كلمة مرور جديدة | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="wrap auth-grid single">
+    <div class="auth-card">
+      <span class="eyebrow">رابط آمن</span>
+      <h1>تعيين كلمة مرور جديدة</h1>
+      <p class="muted">اختر كلمة مرور قوية لا تقل عن 8 أحرف وتحتوي أرقاماً وحروفاً.</p>
+
+      {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+      <form method="post" action="/auth/reset/{{ token }}" class="form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <div class="field">
+          <label for="password">كلمة المرور الجديدة</label>
+          <input id="password" type="password" name="password" required minlength="8" autocomplete="new-password" dir="ltr">
+        </div>
+        <div class="field">
+          <label for="confirm">تأكيد كلمة المرور</label>
+          <input id="confirm" type="password" name="confirm" required autocomplete="new-password" dir="ltr">
+        </div>
+        <button class="btn btn-primary btn-block">حفظ كلمة المرور</button>
+      </form>
+      <p class="form-foot">الرابط صالح لمدة ساعة واحدة ولمرة واحدة فقط.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

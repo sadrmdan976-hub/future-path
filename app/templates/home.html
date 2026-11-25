@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import opp_card, path_card with context %}
+{% block title %}FUTURE PATH | مستقبلك — من مقاعد الدراسة إلى سوق العمل{% endblock %}
+{% block body_class %}page-home{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="pill pill-glass">{{ icon("sparkle") }} منصة تجريبية لجامعة القمة الحديثة</span>
+      <h1>مستقبلك يبدأ من <span class="accent">مقاعد الدراسة</span></h1>
+      <p class="lead">
+        منصة واحدة تجمع ملفك المهني، مهاراتك، فرص التدريب والوظائف الموثقة، ومتابعة طلباتك —
+        حتى تنتقل بثقة من الجامعة إلى سوق العمل.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-accent btn-lg" href="/auth/register">ابدأ رحلتك الآن {{ icon("arrow") }}</a>
+        <a class="btn btn-glass btn-lg" href="/opportunities">تصفّح الفرص</a>
+      </div>
+      <ul class="hero-points">
+        <li>{{ icon("check") }} ملف مهني وسيرة ذاتية جاهزة للطباعة</li>
+        <li>{{ icon("check") }} فرص يراجعها فريق المنصة قبل النشر</li>
+        <li>{{ icon("check") }} متابعة حالة كل طلب خطوة بخطوة</li>
+      </ul>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="mock">
+        <div class="mock-top">
+          <span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span>
+          <span class="mock-url">future-path.app / dashboard</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-user">
+            <span class="avatar">أ</span>
+            <div class="mock-user-info"><strong>أحمد محمد</strong><small>إدارة الأعمال · السنة الثالثة</small></div>
+            <span class="badge badge-demo">تجريبي</span>
+          </div>
+          <div class="mock-progress">
+            <div class="bar"><i style="width: 84%"></i></div>
+            <span>84% اكتمال الملف المهني</span>
+          </div>
+          <div class="mock-chips">
+            <span class="tag">تسويق رقمي</span><span class="tag">Excel</span><span class="tag">إنجليزي · متوسط</span>
+          </div>
+          <div class="mock-opp">
+            <div class="mock-opp-icon">{{ icon("briefcase") }}</div>
+            <div class="mock-opp-info"><strong>متدرب تسويق رقمي</strong><small>طرابلس · تدريب · عن قرب</small></div>
+            <span class="badge badge-ok">موثقة</span>
+          </div>
+          <div class="mock-opp">
+            <div class="mock-opp-icon alt">{{ icon("bell") }}</div>
+            <div class="mock-opp-info"><strong>تمت دعوتك لمقابلة</strong><small>مساعد محتوى بالإنجليزية</small></div>
+            <span class="badge badge-accent">جديد</span>
+          </div>
+        </div>
+      </div>
+      <div class="float-card float-a">
+        <span class="float-icon">{{ icon("check") }}</span>
+        <div><strong>سيرتك جاهزة</strong><small>معاينة وطباعة فورية</small></div>
+      </div>
+      <div class="float-card float-b">
+        <span class="float-icon alt">{{ icon("path") }}</span>
+        <div><strong>مسار جديد</strong><small>أساسيات التسويق الرقمي</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="stats-band">
+  <div class="wrap stats-grid">
+    <div class="stat"><strong>{{ stats.opportunities }}</strong><span>فرص منشورة وموثقة</span></div>
+    <div class="stat"><strong>{{ stats.organizations }}</strong><span>جهة موثقة في المنصة</span></div>
+    <div class="stat"><strong>{{ stats.paths }}</strong><span>مسار مهارات متاح</span></div>
+    <div class="stat"><strong>100%</strong><span>عربي واجهة من اليمين لليسار</span></div>
+  </div>
+</section>
+
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">ماذا تقدم المنصة</span>
+      <h2>كل ما تحتاجه لتبدأ مسارك المهني في مكان واحد</h2>
+      <p>أدوات بسيطة وعملية مصممة لطالب الجامعة، لا تحتاج خبرة سابقة ولا إعداد معقد.</p>
+    </div>
+    <div class="services-grid">
+      {% for title, text, ic in services %}
+      <article class="service-card">
+        <span class="service-icon">{{ icon(ic) }}</span>
+        <h3>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">كيف تعمل</span>
+      <h2>أربع خطوات من التسجيل إلى التقديم</h2>
+    </div>
+    <ol class="steps">
+      {% for title, text in steps %}
+      <li class="step">
+        <span class="step-num">{{ loop.index }}</span>
+        <h3>{{ title }}</h3>
+        <p>{{ text }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="demo-opportunities">
+  <div class="wrap">
+    <div class="section-head row-head">
+      <div>
+        <span class="eyebrow">فرص تجريبية</span>
+        <h2>آخر الفرص على المنصة</h2>
+      </div>
+      <a class="btn btn-ghost" href="/opportunities">كل الفرص {{ icon("arrow") }}</a>
+    </div>
+    <div class="notice notice-demo">
+      {{ icon("info") }}
+      <div>
+        <strong>بيانات تجريبية لأغراض العرض فقط.</strong>
+        الجهات والفرص أدناه وهمية ولا تمثل جهات حقيقية، وتظهر عليها شارة تجريبية.
+      </div>
+    </div>
+    <div class="cards-grid">
+      {% for o in opportunities %}
+        {{ opp_card(o) }}
+      {% else %}
+        <div class="empty"><h3>لا توجد فرص منشورة بعد</h3><p>سيظهر هنا أحدث الفرص بعد مراجعتها ونشرها.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="section-head row-head">
+      <div>
+        <span class="eyebrow">طوّر مهاراتك</span>
+        <h2>مسارات عملية تبدأ بها اليوم</h2>
+      </div>
+      <a class="btn btn-ghost" href="/skills">كل المسارات {{ icon("arrow") }}</a>
+    </div>
+    <div class="cards-grid">
+      {% for p in paths %}
+        {{ path_card(p) }}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap privacy-band">
+    <div class="privacy-copy">
+      <span class="eyebrow">الخصوصية أولاً</span>
+      <h2>بياناتك لا تُشارك تلقائياً مع أي جهة</h2>
+      <p>
+        ملفك المهني ومهاراتك خاصة بك. لا يصل شيء منها إلى الجهات إلا عندما تقرر أنت التقديم على فرصة،
+        وعندها فقط تُرسل نسخة من سيرتك الخاصة بذلك الطلب. يمكنك سحب طلبك في أي وقت.
+      </p>
+      <a class="btn btn-soft" href="/privacy">اقرأ سياسة الخصوصية {{ icon("arrow") }}</a>
+    </div>
+    <div class="privacy-visual" aria-hidden="true">
+      <div class="shield-card">
+        {{ icon("shield", "shield-big") }}
+        <strong>ملفك محمي</strong>
+        <span>عزل كامل بين حسابات الطلاب على مستوى قاعدة البيانات</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap cta-inner">
+    <div>
+      <h2>جاهز تبدأ أول خطوة نحو مستقبلك؟</h2>
+      <p>أنشئ حسابك، أكمل ملفك، وقدّم على أول فرصة خلال دقائق.</p>
+    </div>
+    <div class="cta-actions">
+      <a class="btn btn-accent btn-lg" href="/auth/register">إنشاء حساب طالب</a>
+      <a class="btn btn-glass btn-lg" href="/auth/login">لدي حساب</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

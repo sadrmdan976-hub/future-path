@@ -1,0 +1,90 @@
+{% from "_icons.html" import icon %}
+
+{% macro badge(text, cls="badge-neutral") -%}
+<span class="badge {{ cls }}">{{ text }}</span>
+{%- endmacro %}
+
+{% macro opp_card(o, current_user=None) -%}
+<article class="opp-card">
+  <div class="opp-card-top">
+    <span class="opp-org">{{ icon("building") }} {{ o.org_name }}</span>
+    <span class="opp-badges">
+      {% if o.is_demo %}{{ badge("بيانات تجريبية", "badge-demo") }}{% endif %}
+      {% if o.status == "published" and o.is_verified %}{{ badge("موثقة", "badge-ok") }}{% endif %}
+    </span>
+  </div>
+  <h3 class="opp-title"><a href="/opportunities/{{ o.id }}">{{ o.title }}</a></h3>
+  <div class="opp-tags">
+    <span class="tag">{{ labels.OPP_TYPE[o.type] }}</span>
+    <span class="tag">{{ o.field }}</span>
+    <span class="tag">{{ labels.WORK_MODE[o.work_mode] }}</span>
+    {% if o.work_mode != "remote" %}<span class="tag">{{ icon("pin") }} {{ o.city }}</span>{% endif %}
+  </div>
+  <p class="opp-desc">{{ o.description[:140] }}{% if o.description|length > 140 %}…{% endif %}</p>
+  <div class="opp-card-foot">
+    <span class="meta-line">{{ icon("clock") }} آخر موعد: {{ o.deadline|ar_date }}</span>
+    <a class="btn btn-soft btn-sm" href="/opportunities/{{ o.id }}">التفاصيل {{ icon("arrow") }}</a>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro path_card(p) -%}
+<article class="path-card">
+  <div class="path-card-top">
+    <span class="path-cat">{{ labels.CATEGORIES[p.category] }}</span>
+    {% if p.is_demo %}<span class="badge badge-demo">تجريبي</span>{% endif %}
+  </div>
+  <h3><a href="/skills/{{ p.id }}">{{ p.title }}</a></h3>
+  <p>{{ p.description[:110] }}{% if p.description|length > 110 %}…{% endif %}</p>
+  <div class="path-card-foot">
+    <span class="tag">{{ labels.PATH_LEVEL[p.level] }}</span>
+    {% if p.duration %}<span class="tag">{{ p.duration }}</span>{% endif %}
+    <a class="link-more" href="/skills/{{ p.id }}">استعرض المسار {{ icon("arrow") }}</a>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro status_badge(status) -%}
+{{ badge(labels.APP_STATUS[status] if status in labels.APP_STATUS else (labels.OPP_STATUS[status] if status in labels.OPP_STATUS else status), labels.BADGE[status]) }}
+{%- endmacro %}
+
+{% macro pagination(page, pages, endpoint, params) -%}
+{% if pages > 1 %}
+<nav class="pagination" aria-label="التنقل بين الصفحات">
+  {% if page > 1 %}
+    <a class="page-btn" href="{{ endpoint }}?{{ params }}page={{ page - 1 }}">السابق</a>
+  {% endif %}
+  {% for n in range(1, pages + 1) %}
+    {% if n == page %}
+      <span class="page-btn current">{{ n }}</span>
+    {% elif n <= 2 or n > pages - 2 or (n >= page - 1 and n <= page + 1) %}
+      <a class="page-btn" href="{{ endpoint }}?{{ params }}page={{ n }}">{{ n }}</a>
+    {% elif n == 3 or n == pages - 2 %}
+      <span class="page-gap">…</span>
+    {% endif %}
+  {% endfor %}
+  {% if page < pages %}
+    <a class="page-btn" href="{{ endpoint }}?{{ params }}page={{ page + 1 }}">التالي</a>
+  {% endif %}
+</nav>
+{% endif %}
+{%- endmacro %}
+
+{% macro progress_ring(score) -%}
+<div class="ring" style="--value: {{ score }}">
+  <svg viewBox="0 0 120 120" aria-hidden="true">
+    <circle class="ring-track" cx="60" cy="60" r="52"/>
+    <circle class="ring-bar" cx="60" cy="60" r="52"/>
+  </svg>
+  <div class="ring-label"><strong>{{ score }}%</strong><span>اكتمال الملف</span></div>
+</div>
+{%- endmacro %}
+
+{% macro empty_state(title, text, cta_href=None, cta_label=None) -%}
+<div class="empty">
+  <div class="empty-icon">{{ icon("sparkle") }}</div>
+  <h3>{{ title }}</h3>
+  <p>{{ text }}</p>
+  {% if cta_href %}<a class="btn btn-primary btn-sm" href="{{ cta_href }}">{{ cta_label }}</a>{% endif %}
+</div>
+{%- endmacro %}

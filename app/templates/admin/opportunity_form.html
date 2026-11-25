@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import status_badge with context %}
+{% block title %}{{ 'فرصة جديدة' if mode == 'new' else 'تعديل الفرصة' }} | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <a class="back-link" href="/admin/opportunities">{{ icon("arrow") }} الفرص</a>
+    <h1>{{ 'فرصة جديدة' if mode == 'new' else 'تعديل الفرصة' }}</h1>
+    {% if opp %}<div class="head-chips">{{ status_badge(opp.status) }}{% if opp.is_verified %}<span class="badge badge-ok">موثقة</span>{% endif %}{% if opp.is_demo %}<span class="badge badge-demo">بيانات تجريبية</span>{% endif %}</div>{% endif %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap form-narrow">
+    {% if error %}<div class="notice notice-error">{{ icon("warning") }}<div>{{ error }}</div></div>{% endif %}
+    {% if not orgs %}<div class="notice notice-warn">{{ icon("warning") }}<div>لا توجد جهات بعد. <a href="/admin/organizations">أضف جهة أولاً</a>.</div></div>{% endif %}
+
+    <form method="post" action="{{ '/admin/opportunities' if mode == 'new' else '/admin/opportunities/' ~ opp.id }}" class="form card">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+
+      <div class="field">
+        <label>الجهة <span class="req">*</span></label>
+        <select name="organization_id" required>
+          <option value="">اختر الجهة</option>
+          {% for org in orgs %}
+          <option value="{{ org.id }}" {{ 'selected' if values.get('organization_id')|string == org.id|string }}>{{ org.name }}{% if org.verification_status != 'verified' %} (غير موثقة){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label>عنوان الفرصة <span class="req">*</span></label>
+        <input name="title" value="{{ values.get('title') or '' }}" maxlength="180" required>
+      </div>
+
+      <div class="grid-3">
+        <div class="field">
+          <label>النوع</label>
+          <select name="type">
+            {% for key, label in labels.OPP_TYPE.items() %}<option value="{{ key }}" {{ 'selected' if values.get('type') == key }}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>المجال</label>
+          <select name="field" required>
+            <option value="">اختر المجال</option>
+            {% for f in labels.FIELDS %}<option value="{{ f }}" {{ 'selected' if values.get('field') == f }}>{{ f }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>نوع الدوام</label>
+          <select name="work_mode">
+            {% for key, label in labels.WORK_MODE.items() %}<option value="{{ key }}" {{ 'selected' if values.get('work_mode') == key }}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>المدينة <span class="req">*</span></label>
+          <input name="city" value="{{ values.get('city') or '' }}" list="citiesList" maxlength="80" required>
+          <datalist id="citiesList">{% for c in labels.CITIES %}<option value="{{ c }}">{% endfor %}</datalist>
+        </div>
+        <div class="field">
+          <label>آخر موعد للتقديم <span class="req">*</span></label>
+          <input type="date" name="deadline" value="{{ values.get('deadline') or '' }}" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>تفاصيل الموقع (اختياري)</label>
+        <input name="location_details" value="{{ values.get('location_details') or '' }}" maxlength="200" placeholder="مثال: برج المتوسط، الطابق الثالث">
+      </div>
+
+      <div class="field">
+        <label>الوصف <span class="req">*</span></label>
+        <textarea name="description" rows="6" maxlength="4000" required>{{ values.get('description') or '' }}</textarea>
+        <small class="hint">كل سطر جديد يظهر فقرة منفصلة.</small>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>المتطلبات</label>
+          <textarea name="requirements" rows="5" maxlength="2000" placeholder="سطر لكل متطلب">{{ values.get('requirements') or '' }}</textarea>
+        </div>
+        <div class="field">
+          <label>المهام</label>
+          <textarea name="tasks" rows="5" maxlength="2000" placeholder="سطر لكل مهمة">{{ values.get('tasks') or '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit" name="action" value="save" {{ 'disabled' if not orgs }}>حفظ</button>
+        <button class="btn btn-soft" type="submit" name="action" value="review" {{ 'disabled' if not orgs }}>حفظ وإرسال للمراجعة</button>
+        <a class="btn btn-ghost" href="/admin/opportunities">إلغاء</a>
+      </div>
+    </form>
+
+    {% if mode == 'edit' %}
+    <div class="card form-note">
+      <h2 class="card-title">نشر / إيقاف</h2>
+      <p class="muted small">النشر يتطلب جهة موثقة وموعداً لم ينتهِ. عند النشر تُعلَّم الفرصة كموثقة وتظهر للطلاب.</p>
+      <div class="inline-actions">
+        {% if opp.status != 'published' %}
+        <form method="post" action="/admin/opportunities/{{ opp.id }}/action">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <input type="hidden" name="action" value="publish">
+          <button class="btn btn-primary btn-sm" type="submit">توثيق ونشر</button>
+        </form>
+        {% else %}
+        <form method="post" action="/admin/opportunities/{{ opp.id }}/action" data-confirm="إيقاف الفرصة؟">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <input type="hidden" name="action" value="suspend">
+          <button class="btn btn-warn btn-sm" type="submit">إيقاف</button>
+        </form>
+        <form method="post" action="/admin/opportunities/{{ opp.id }}/action" data-confirm="إغلاق الفرصة نهائياً؟">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <input type="hidden" name="action" value="close">
+          <button class="btn btn-ghost btn-sm" type="submit">إغلاق</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

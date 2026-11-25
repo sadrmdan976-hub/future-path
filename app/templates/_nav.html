@@ -1,0 +1,72 @@
+{% from "_icons.html" import icon %}
+{% set p = request.url.path %}
+{% set is_admin = user and user.is_admin %}
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="/" aria-label="FUTURE PATH مستقبلك">
+      <span class="brand-mark">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M6 26V15l7 5V9l7 5V5l6 4v17z" fill="currentColor" opacity=".9"/>
+          <circle cx="24.5" cy="25" r="2" fill="#eaa33b"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <strong>FUTURE PATH</strong>
+        <small>مستقبلك</small>
+      </span>
+    </a>
+
+    <button class="nav-toggle" type="button" data-nav-toggle aria-label="فتح القائمة" aria-expanded="false">
+      <span class="nav-toggle-open">{{ icon("menu") }}</span>
+      <span class="nav-toggle-close">{{ icon("close") }}</span>
+    </button>
+
+    <nav class="nav" id="mainNav" aria-label="القائمة الرئيسية">
+      {% if is_admin %}
+        <a class="nav-link {{ 'active' if p == '/admin' }}" href="/admin">لوحة الإدارة</a>
+        <a class="nav-link {{ 'active' if p.startswith('/opportunities') }}" href="/opportunities">الفرص</a>
+        <a class="nav-link {{ 'active' if p.startswith('/skills') }}" href="/skills">مسارات المهارات</a>
+        <a class="nav-link {{ 'active' if p.startswith('/admin/applications') }}" href="/admin/applications">الطلبات</a>
+      {% elif user %}
+        <a class="nav-link {{ 'active' if p == '/dashboard' }}" href="/dashboard">لوحتي</a>
+        <a class="nav-link {{ 'active' if p == '/profile' }}" href="/profile">ملفي المهني</a>
+        <a class="nav-link {{ 'active' if p.startswith('/opportunities') }}" href="/opportunities">الفرص</a>
+        <a class="nav-link {{ 'active' if p == '/discover' }}" href="/discover">اكتشف نفسك</a>
+        <a class="nav-link {{ 'active' if p.startswith('/skills') }}" href="/skills">المهارات</a>
+        <a class="nav-link {{ 'active' if p == '/cv' }}" href="/cv">سيرتي</a>
+        <a class="nav-link {{ 'active' if p == '/applications' }}" href="/applications">طلباتي</a>
+      {% else %}
+        <a class="nav-link {{ 'active' if p == '/' }}" href="/">الرئيسية</a>
+        <a class="nav-link {{ 'active' if p.startswith('/opportunities') }}" href="/opportunities">الفرص</a>
+        <a class="nav-link {{ 'active' if p.startswith('/skills') }}" href="/skills">مسارات المهارات</a>
+        <a class="nav-link" href="/#how">كيف تعمل</a>
+      {% endif %}
+
+      <div class="nav-actions">
+        {% if user %}
+          <a class="nav-user" href="{{ '/admin' if is_admin else '/account' }}" title="الحساب">
+            <span class="avatar avatar-sm">{{ user.full_name[:1] }}</span>
+            <span class="nav-user-name">{{ user.full_name }}</span>
+            {% if user.is_admin %}<span class="chip chip-admin">مسؤول</span>{% endif %}
+            {% if user.is_demo %}<span class="chip chip-demo">تجريبي</span>{% endif %}
+          </a>
+          <form method="post" action="/auth/logout" class="inline-form">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <button type="submit" class="btn btn-ghost btn-sm">{{ icon("logout") }} خروج</button>
+          </form>
+        {% else %}
+          <a class="btn btn-ghost btn-sm" href="/auth/login">تسجيل الدخول</a>
+          <a class="btn btn-primary btn-sm" href="/auth/register">ابدأ الآن</a>
+        {% endif %}
+      </div>
+    </nav>
+  </div>
+</header>
+{% if demo_mode %}
+<div class="demo-strip">
+  <div class="wrap">
+    {{ icon("info") }}
+    <span>نسخة عرض تجريبية — كل البيانات والحسابات المعروضة وهمية لأغراض العرض فقط.</span>
+  </div>
+</div>
+{% endif %}

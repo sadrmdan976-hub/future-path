@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}اكتشف نفسك | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">اكتشف نفسك</span>
+    <h1>{{ "نتيجتك الإرشادية" if result and not retake else "خمسة أسئلة ترسم اتجاهك" }}</h1>
+    <p class="muted">
+      {{ "نتيجة إرشادية تساعدك على اختيار مجالات تناسب اهتماماتك. ليست تقييماً أكاديمياً ولا شهادة معتمدة." if result and not retake else "اختر الإجابة الأقرب لك في كل سؤال. لا توجد إجابة صحيحة أو خاطئة." }}
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap discover-wrap">
+    {% if result and not retake %}
+      <div class="result-hero">
+        <div class="result-icon">{{ icon("compass") }}</div>
+        <span class="badge badge-info">نتيجة إرشادية غير معتمدة</span>
+        <h2>المجالات الأنسب لك وفق إجاباتك</h2>
+        <div class="result-fields">
+          {% for key, f in fields.items() %}
+            {% if f.label in result.suggested_fields %}
+            <article class="result-field">
+              <span class="result-rank">{{ loop.index }}</span>
+              <h3>{{ f.label }}</h3>
+              <p>{{ f.blurb }}</p>
+            </article>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <div class="result-actions">
+          <a class="btn btn-primary" href="/opportunities">استكشف الفرص في هذه المجالات {{ icon("arrow") }}</a>
+          <a class="btn btn-ghost" href="/skills">مسارات لتطوير المهارات</a>
+          <a class="btn btn-ghost" href="/discover?retake=1">إعادة الاختبار</a>
+        </div>
+        <p class="muted small result-date">آخر تحديث: {{ result.created_at|ar_datetime }}</p>
+      </div>
+
+      <div class="notice">
+        {{ icon("info") }}
+        <div>
+          هذه النتيجة إرشادية فقط، مبنية على إجاباتك، ولا تُعد تقييماً أكاديمياً معتمداً من الجامعة ولا توصية توظيف.
+          استخدمها كنقطة انطلاق للاستكشاف.
+        </div>
+      </div>
+
+    {% else %}
+      {% if result %}
+      <div class="notice notice-demo">
+        {{ icon("info") }}
+        <div>لديك نتيجة محفوظة. إعادة الاختبار ستحفظ نتيجة جديدة أحدث وتُبقي النتيجة السابقة في السجل.</div>
+      </div>
+      {% endif %}
+      <form method="post" action="/discover" class="quiz-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        {% for q in quiz %}
+        <fieldset class="quiz-q">
+          <legend><span class="qnum">{{ "%02d"|format(loop.index) }}</span> {{ q.text }}</legend>
+          <div class="quiz-options">
+            {% for opt in q.options %}
+            <label class="quiz-opt">
+              <input type="radio" name="{{ q.id }}" value="{{ loop.index0 }}" required>
+              <span class="quiz-opt-mark"></span>
+              <span class="quiz-opt-label">{{ opt.label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+        {% endfor %}
+        <div class="quiz-submit">
+          <button type="submit" class="btn btn-primary btn-lg">عرض نتيجتي الإرشادية {{ icon("arrow") }}</button>
+          <span class="muted small">النتيجة إرشادية فقط وغير معتمدة أكاديمياً.</span>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

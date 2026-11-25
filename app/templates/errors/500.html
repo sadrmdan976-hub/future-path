@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}خطأ غير متوقع | FUTURE PATH{% endblock %}
+{% block content %}
+<section class="section error-page">
+  <div class="wrap error-box">
+    <div class="error-code">500</div>
+    <h1>حدث خطأ غير متوقع</h1>
+    <p class="muted">سجّلنا المشكلة وسنراجعها. جرّب تحديث الصفحة بعد قليل.</p>
+    <div class="error-actions">
+      <a class="btn btn-primary" href="/">{{ icon("arrow") }} العودة للرئيسية</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

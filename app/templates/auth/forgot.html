@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}استعادة كلمة المرور | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="wrap auth-grid single">
+    <div class="auth-card">
+      <span class="eyebrow">استعادة كلمة المرور</span>
+      {% if sent %}
+        <h1>تم استلام طلبك</h1>
+        {% if delivered %}
+          <div class="alert alert-ok">أرسلنا رابط إعادة التعيين إلى بريدك. الرابط صالح لمدة ساعة واحدة.</div>
+        {% else %}
+          <div class="notice">
+            {{ icon("info") }}
+            <div>
+              إذا كان البريد مسجلاً في المنصة، فسيُنشأ رابط استعادة صالح لمدة ساعة.
+              {% if not smtp_ready %}
+              إرسال البريد التلقائي غير مُفعّل في هذه النسخة، لذا تواصل مع إدارة المنصة
+              للحصول على رابط إعادة التعيين الخاص بك.
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+        <div class="form-actions">
+          <a class="btn btn-primary" href="/auth/login">العودة لتسجيل الدخول</a>
+          <a class="btn btn-ghost" href="/">الرئيسية</a>
+        </div>
+      {% else %}
+        <h1>أدخل بريدك الإلكتروني</h1>
+        <p class="muted">سنرسل لك رابطاً لإعادة تعيين كلمة المرور إذا كان البريد مسجلاً.</p>
+        <form method="post" action="/auth/forgot" class="form">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <div class="field">
+            <label for="email">البريد الإلكتروني</label>
+            <input id="email" type="email" name="email" required autocomplete="email" dir="ltr" placeholder="name@example.com">
+          </div>
+          <button class="btn btn-primary btn-block">إرسال رابط الاستعادة</button>
+        </form>
+        <p class="form-foot"><a href="/auth/login">العودة لتسجيل الدخول</a></p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

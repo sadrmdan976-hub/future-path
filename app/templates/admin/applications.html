@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import status_badge with context %}
+{% block title %}الطلبات | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">الإدارة</span>
+    <h1>طلبات التقديم</h1>
+    <p class="muted">راجع الطلبات وحدّث حالتها. الطالب يرى الحالة في صفحة «طلباتي».</p>
+    {% include "admin/_nav.html" %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap">
+    <div class="chip-row">
+      <a class="chip {{ 'active' if not f_status }}" href="/admin/applications">الكل</a>
+      {% for key, label in statuses.items() %}
+      <a class="chip {{ 'active' if f_status == key }}" href="/admin/applications?status={{ key }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    {% if rows %}
+    <div class="table-wrap card">
+      <table class="table">
+        <thead><tr><th>الطالب</th><th>الفرصة</th><th>الجهة</th><th>تاريخ التقديم</th><th>الحالة</th><th></th></tr></thead>
+        <tbody>
+          {% for a in rows %}
+          <tr>
+            <td><strong>{{ a.student_name }}</strong><br><span class="muted small" dir="ltr">{{ a.student_email }}</span></td>
+            <td>{{ a.opp_title or "—" }}</td>
+            <td>{{ a.org_name or "—" }}</td>
+            <td>{{ a.applied_at|ar_date }}</td>
+            <td>{{ status_badge(a.status) }}</td>
+            <td><a class="btn btn-ghost btn-xs" href="/admin/applications/{{ a.id }}">{{ icon("eye") }} عرض</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty"><h3>لا توجد طلبات</h3><p>لم يتقدم أي طالب ضمن هذا الفلتر بعد.</p></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

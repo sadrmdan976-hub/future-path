@@ -1,0 +1,8 @@
+.venv/
+.pgdata/
+__pycache__/
+*.pyc
+.env
+.env.seed
+*.log
+.DS_Store

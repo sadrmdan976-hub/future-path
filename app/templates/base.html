@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}FUTURE PATH | مستقبلك{% endblock %}</title>
+  <meta name="description" content="منصة مستقبلك تربط طلاب الجامعات بالفرص التدريبية والوظيفية وتطور مهاراتهم من مقاعد الدراسة إلى سوق العمل.">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main">تخطي إلى المحتوى</a>
+  {% include "_nav.html" %}
+  {% block hero %}{% endblock %}
+  <main id="main" class="{% block main_class %}main{% endblock %}">
+    <div class="wrap">
+      {% include "_flashes.html" %}
+    </div>
+    {% block content %}{% endblock %}
+  </main>
+  {% include "_footer.html" %}
+  <script src="/static/js/app.js" defer></script>
+</body>
+</html>

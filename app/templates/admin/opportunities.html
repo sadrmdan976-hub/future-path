@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_macros.html" import status_badge with context %}
+{% block title %}إدارة الفرص | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">الإدارة</span>
+    <h1>الفرص</h1>
+    <p class="muted">أنشئ الفرص، راجعها، ووثّقها قبل النشر. لا تظهر للطلاب إلا الفرص الموثّقة المنشورة.</p>
+    {% include "admin/_nav.html" %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap">
+    <div class="toolbar">
+      <form method="get" action="/admin/opportunities" class="toolbar-form">
+        <input type="search" name="q" value="{{ q }}" placeholder="ابحث بالعنوان أو الجهة" maxlength="100">
+        <select name="status">
+          <option value="">كل الحالات</option>
+          {% for key, label in statuses.items() %}<option value="{{ key }}" {{ 'selected' if f_status == key }}>{{ label }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-soft btn-sm" type="submit">تصفية</button>
+        {% if q or f_status %}<a class="btn btn-ghost btn-sm" href="/admin/opportunities">مسح</a>{% endif %}
+      </form>
+      <a class="btn btn-primary btn-sm" href="/admin/opportunities/new">{{ icon("plus") }} فرصة جديدة</a>
+    </div>
+
+    {% if rows %}
+    <div class="table-wrap card">
+      <table class="table table-actions">
+        <thead>
+          <tr><th>العنوان</th><th>الجهة</th><th>النوع</th><th>المدينة</th><th>الحالة</th><th>طلبات</th><th>آخر تحديث</th><th>إجراءات</th></tr>
+        </thead>
+        <tbody>
+          {% for o in rows %}
+          <tr>
+            <td>
+              <a href="/opportunities/{{ o.id }}">{{ o.title }}</a>
+              {% if o.is_demo %}<span class="badge badge-demo">تجريبي</span>{% endif %}
+              {% if o.is_verified %}<span class="badge badge-ok">موثقة</span>{% endif %}
+            </td>
+            <td>{{ o.org_name }}{% if o.org_status != 'verified' %} <span class="badge badge-warn">جهة غير موثقة</span>{% endif %}</td>
+            <td>{{ labels.OPP_TYPE[o.type] }}</td>
+            <td>{{ o.city }}</td>
+            <td>{{ status_badge(o.status) }}</td>
+            <td>{{ o.apps_count }}</td>
+            <td>{{ o.updated_at|ar_date }}</td>
+            <td class="actions-cell">
+              <a class="btn btn-ghost btn-xs" href="/admin/opportunities/{{ o.id }}/edit">{{ icon("edit") }} تعديل</a>
+              {% if o.status in ('draft', 'pending_review', 'suspended', 'closed') %}
+                <form method="post" action="/admin/opportunities/{{ o.id }}/action">
+                  <input type="hidden" name="csrf" value="{{ csrf }}">
+                  <input type="hidden" name="action" value="publish">
+                  <button class="btn btn-primary btn-xs" type="submit" {{ 'disabled title=وثّق الجهة أولاً' if o.org_status != 'verified' }}>نشر وتوثيق</button>
+                </form>
+              {% endif %}
+              {% if o.status == 'published' %}
+                <form method="post" action="/admin/opportunities/{{ o.id }}/action" data-confirm="إيقاف الفرصة يخفيها عن الطلاب. متابعة؟">
+                  <input type="hidden" name="csrf" value="{{ csrf }}">
+                  <input type="hidden" name="action" value="suspend">
+                  <button class="btn btn-warn btn-xs" type="submit">إيقاف</button>
+                </form>
+                <form method="post" action="/admin/opportunities/{{ o.id }}/action" data-confirm="إغلاق الفرصة نهائياً؟">
+                  <input type="hidden" name="csrf" value="{{ csrf }}">
+                  <input type="hidden" name="action" value="close">
+                  <button class="btn btn-ghost btn-xs" type="submit">إغلاق</button>
+                </form>
+              {% endif %}
+              {% if o.status == 'published' or o.status == 'suspended' %}
+                <form method="post" action="/admin/opportunities/{{ o.id }}/action">
+                  <input type="hidden" name="csrf" value="{{ csrf }}">
+                  <input type="hidden" name="action" value="review">
+                  <button class="btn btn-ghost btn-xs" type="submit">مراجعة</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty"><h3>لا توجد فرص مطابقة</h3><p>أنشئ فرصة جديدة أو غيّر الفلاتر.</p><a class="btn btn-primary btn-sm" href="/admin/opportunities/new">فرصة جديدة</a></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

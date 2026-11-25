@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}مسارات المهارات | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">الإدارة</span>
+    <h1>مسارات المهارات</h1>
+    <p class="muted">المسارات الظاهرة للطلاب في صفحة المهارات.</p>
+    {% include "admin/_nav.html" %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap admin-split">
+    <div class="card">
+      <h2 class="card-title">{{ icon("plus") }} إضافة مسار</h2>
+      <form method="post" action="/admin/paths" class="form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <div class="field"><label>عنوان المسار <span class="req">*</span></label><input name="title" maxlength="160" required></div>
+        <div class="field">
+          <label>الفئة</label>
+          <select name="category">
+            {% for key, label in categories.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field"><label>الوصف <span class="req">*</span></label><textarea name="description" rows="3" maxlength="1200" required></textarea></div>
+        <div class="field"><label>رابط المورد <span class="req">*</span></label><input name="resource_url" dir="ltr" placeholder="https://..." required></div>
+        <div class="grid-2">
+          <div class="field">
+            <label>المستوى</label>
+            <select name="level">
+              {% for key, label in levels.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field"><label>المدة</label><input name="duration" maxlength="60" placeholder="مثال: 4 أسابيع"></div>
+        </div>
+        <label class="check"><input type="checkbox" name="is_demo"> <span>مسار تجريبي (لأغراض العرض)</span></label>
+        <button class="btn btn-primary btn-sm" type="submit">إضافة المسار</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">المسارات ({{ rows|length }})</h2>
+      {% if rows %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>العنوان</th><th>الفئة</th><th>المستوى</th><th>الظهور</th><th></th></tr></thead>
+          <tbody>
+            {% for p in rows %}
+            <tr>
+              <td>
+                <a href="/skills/{{ p.id }}">{{ p.title }}</a>
+                {% if p.is_demo %}<span class="badge badge-demo">تجريبي</span>{% endif %}
+              </td>
+              <td>{{ categories[p.category] }}</td>
+              <td>{{ levels[p.level] }}</td>
+              <td>{% if p.is_active %}<span class="badge badge-ok">ظاهر</span>{% else %}<span class="badge badge-neutral">مخفي</span>{% endif %}</td>
+              <td class="actions-cell">
+                <a class="btn btn-ghost btn-xs" href="/admin/paths/{{ p.id }}/edit">{{ icon("edit") }} تعديل</a>
+                <form method="post" action="/admin/paths/{{ p.id }}/toggle">
+                  <input type="hidden" name="csrf" value="{{ csrf }}">
+                  <button class="btn btn-ghost btn-xs" type="submit">{{ 'إخفاء' if p.is_active else 'إظهار' }}</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="muted">لا توجد مسارات بعد.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

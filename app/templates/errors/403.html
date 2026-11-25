@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}غير مصرح | FUTURE PATH{% endblock %}
+{% block content %}
+<section class="section error-page">
+  <div class="wrap error-box">
+    <div class="error-code">403</div>
+    <h1>لا تملك صلاحية الوصول لهذه الصفحة</h1>
+    <p class="muted">هذه الصفحة مخصصة للمسؤولين فقط. إذا كنت تعتقد أن هذا خطأ، تواصل مع إدارة المنصة.</p>
+    <div class="error-actions">
+      <a class="btn btn-primary" href="/">{{ icon("arrow") }} العودة للرئيسية</a>
+      <a class="btn btn-ghost" href="/dashboard">لوحتي</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

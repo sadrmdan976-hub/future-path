@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}المستخدمون | FUTURE PATH{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">الإدارة</span>
+    <h1>المستخدمون</h1>
+    <p class="muted">تفعيل أو إيقاف الحسابات، وإنشاء روابط إعادة تعيين كلمة المرور.</p>
+    {% include "admin/_nav.html" %}
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="wrap">
+    <form method="get" action="/admin/users" class="toolbar-form toolbar">
+      <input type="search" name="q" value="{{ q }}" placeholder="ابحث بالاسم أو البريد" maxlength="100">
+      <button class="btn btn-soft btn-sm" type="submit">{{ icon("search") }} بحث</button>
+      {% if q %}<a class="btn btn-ghost btn-sm" href="/admin/users">مسح</a>{% endif %}
+    </form>
+
+    {% if rows %}
+    <div class="table-wrap card">
+      <table class="table table-actions">
+        <thead><tr><th>الاسم</th><th>البريد</th><th>النوع</th><th>الجامعة / التخصص</th><th>الطلبات</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          {% for u in rows %}
+          <tr>
+            <td>
+              {{ u.full_name }}
+              {% if u.is_demo %}<span class="badge badge-demo">تجريبي</span>{% endif %}
+              {% if u.is_admin %}<span class="chip chip-admin">مسؤول</span>{% endif %}
+            </td>
+            <td dir="ltr">{{ u.email }}</td>
+            <td>{{ 'مسؤول' if u.account_type == 'admin' else 'طالب' }}</td>
+            <td>{% if u.university %}{{ u.university }}{% if u.major %}<br><span class="muted small">{{ u.major }}</span>{% endif %}{% else %}—{% endif %}</td>
+            <td>{{ u.apps_count }}</td>
+            <td>{% if u.is_active %}<span class="badge badge-ok">نشط</span>{% else %}<span class="badge badge-danger">موقوف</span>{% endif %}</td>
+            <td class="actions-cell">
+              {% if u.id != user.id %}
+              <form method="post" action="/admin/users/{{ u.id }}/active"{% if u.is_active %} data-confirm="إيقاف الحساب يلغي جلساته الحالية. متابعة؟"{% endif %}>
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <input type="hidden" name="active" value="{{ '0' if u.is_active else '1' }}">
+                <button class="btn {{ 'btn-warn' if u.is_active else 'btn-soft' }} btn-xs" type="submit">{{ 'إيقاف' if u.is_active else 'تفعيل' }}</button>
+              </form>
+              {% endif %}
+              {% if u.account_type == 'student' %}
+              <form method="post" action="/admin/users/{{ u.id }}/reset-link">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button class="btn btn-ghost btn-xs" type="submit">{{ icon("key") }} رابط إعادة تعيين</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty"><h3>لا نتائج</h3><p>لم يتم العثور على مستخدمين بهذا البحث.</p></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
