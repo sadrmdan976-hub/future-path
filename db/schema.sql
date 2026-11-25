@@ -13,6 +13,15 @@ end $$;
 
 grant usage on schema future_path to future_path_app;
 
+-- The connecting owner must be able to SET ROLE (needed on managed Postgres
+-- such as Supabase, where the owner is not a superuser).
+do $$
+begin
+  execute format('grant future_path_app to %I', current_user);
+exception
+  when duplicate_object then null;
+end $$;
+
 -- ============================== الجداول ==============================
 
 create table future_path.users (
