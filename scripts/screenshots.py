@@ -18,7 +18,8 @@ from pathlib import Path
 
 import websocket
 
-BASE = "http://127.0.0.1:8000"
+BASE = (sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8000").rstrip("/")
+COOKIE_DOMAIN = urllib.parse.urlsplit(BASE).hostname or "127.0.0.1"
 PORT = 9333
 CHROME = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
 OUT = Path.home() / "Desktop" / "FUTURE PATH - لقطات"
@@ -83,7 +84,8 @@ def capture(cdp: CDP, url: str, filename: str, token: str | None = None,
     cdp.send("Network.clearBrowserCookies")
     if token:
         cdp.send("Network.setCookie", {
-            "name": "fp_session", "value": token, "domain": "127.0.0.1", "path": "/", "httpOnly": True,
+            "name": "fp_session", "value": token, "domain": COOKIE_DOMAIN, "path": "/",
+            "httpOnly": True, "secure": BASE.startswith("https://"),
         })
     cdp.send("Page.navigate", {"url": url})
     wait_ready(cdp)
